@@ -190,8 +190,11 @@ class Patches implements PluginInterface, EventSubscriberInterface {
           }
           $dependency_patches = $extra['patches'];
           foreach ($dependency_patches as $other_package => &$other_package_patches) {
-            foreach ($other_package_patches as $name => &$loc) {
+            foreach ($other_package_patches as $patch_name => &$loc) {
               if (substr($loc, 0, 2) === './') {
+                if ($this->io->isVerbose()) {
+                  $this->io->write('Relocating relative patch from '.$loc.' to '.$manager->getInstaller($package->getType())->getInstallPath($package) . substr($loc, 1));
+                }
                 $loc = $manager->getInstaller($package->getType())->getInstallPath($package) . substr($loc, 1);
               }
             }
