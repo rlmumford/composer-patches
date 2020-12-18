@@ -170,6 +170,9 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     }
 
     $manager = $event->getComposer()->getInstallationManager();
+    if (class_exists('\Composer\Installers\Installer')) {
+      $manager->addInstaller(new \Composer\Installers\Installer($this->io, $event->getComposer()));
+    }
     $extra = $this->composer->getPackage()->getExtra();
     $patches_ignore = isset($extra['patches-ignore']) ? $extra['patches-ignore'] : array();
 
