@@ -169,6 +169,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       $this->io->write('<info>No patches supplied.</info>');
     }
 
+    $manager = $event->getComposer()->getInstallationManager();
     $extra = $this->composer->getPackage()->getExtra();
     $patches_ignore = isset($extra['patches-ignore']) ? $extra['patches-ignore'] : array();
 
@@ -187,7 +188,13 @@ class Patches implements PluginInterface, EventSubscriberInterface {
               }
             }
           }
-          $this->patches = $this->arrayMergeRecursiveDistinct($this->patches, $extra['patches']);
+          $dependency_patches = $extra['patches'];
+          foreach ($dependency_patches as $name => &$loc) {
+            if (substr($loc, 0, 2) === './') {
+              $loc = $manager->getInstaller($package->getType())->getInstallPath($package).substr($loc, 1);
+            }
+          }
+          $this->patches = $this->arrayMergeRecursiveDistinct($this->patches, $dependency_patches);
         }
         // Unset installed patches for this package
         if(isset($this->installedPatches[$package->getName()])) {
@@ -362,9 +369,6 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     // Local patch file.
     if (file_exists($patch_url)) {
       $filename = realpath($patch_url);
-    }
-    else if (file_exists($install_path.'/'.$patch_url)) {
-      $filename = realpath($install_path.'/'.$patch_url);
     }
     else {
       // Generate random (but not cryptographically so) filename.
