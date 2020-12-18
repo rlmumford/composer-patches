@@ -363,6 +363,9 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     if (file_exists($patch_url)) {
       $filename = realpath($patch_url);
     }
+    else if (file_exists($install_path.'/'.$patch_url)) {
+      $filename = realpath($install_path.'/'.$patch_url);
+    }
     else {
       // Generate random (but not cryptographically so) filename.
       $filename = uniqid(sys_get_temp_dir().'/') . ".patch";
