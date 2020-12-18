@@ -189,9 +189,11 @@ class Patches implements PluginInterface, EventSubscriberInterface {
             }
           }
           $dependency_patches = $extra['patches'];
-          foreach ($dependency_patches as $name => &$loc) {
-            if (substr($loc, 0, 2) === './') {
-              $loc = $manager->getInstaller($package->getType())->getInstallPath($package).substr($loc, 1);
+          foreach ($dependency_patches as $other_package => &$other_package_patches) {
+            foreach ($other_package_patches as $name => &$loc) {
+              if (substr($loc, 0, 2) === './') {
+                $loc = $manager->getInstaller($package->getType())->getInstallPath($package) . substr($loc, 1);
+              }
             }
           }
           $this->patches = $this->arrayMergeRecursiveDistinct($this->patches, $dependency_patches);
